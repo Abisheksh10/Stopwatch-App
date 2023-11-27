@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stopwatch App</title>
+  <style>
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: rgb(93, 109, 141); /* Light background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+}
+
+#stopwatch {
+  background-color: #27392e; /* Emerald green container */
+  border-radius: 50px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  padding: 125px;
+  text-align: center;
+  color: #ffffff; /* White text */
+}
+
+#display {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+#buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+button {
+  background-color: #3498db; /* Dodger blue button */
+  color: #ffffff; /* White text */
+  padding: 15px 30px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+button:disabled {
+  background-color: #95a5a6; /* Silver disabled button */
+  cursor: not-allowed;
+}
+
+#lapTimes {
+  margin-top: 20px;
+}
+
+#lapTimes h3 {
+  margin-bottom: 10px;
+  color: #ffffff; /* White text */
+}
+
+#lapTimes ul {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+
+#lapTimes li {
+  margin-bottom: 5px;
+  color: #ffffff; /* White text */
+}
+
+  </style>
+</head>
+<body>
+<div id="stopwatch">
+  <h2>Stopwatch</h2>
+  <br>
+  <div id="display">00:00:00</div>
+  <br>
+  <div id="buttons">
+    <button onclick="startStop()">Start</button>
+    <button onclick="lap()">Lap</button>
+    <button onclick="reset()">Reset</button>
+  </div>
+  <br/>
+  <div id="lapTimes">
+    <h3>Lap Times</h3>
+    <ul id="lapList"></ul>
+  </div>
+</div>
+
+<script>
+  let timer;
+  let isRunning = false;
+  let startTime;
+  let elapsedTime = 0;
+  let lapTimes = [];
+
+  function startStop() {
+    const startStopButton = document.querySelector("button:nth-child(1)");
+
+    if (isRunning) {
+      clearInterval(timer);
+      isRunning = false;
+    } else {
+      startTime = new Date().getTime() - elapsedTime;
+      timer = setInterval(updateDisplay, 10);
+      isRunning = true;
+    }
+
+    startStopButton.innerText = isRunning ? "Stop" : "Start";
+    document.querySelector("button:nth-child(2)").disabled = !isRunning;
+  }
+
+  function lap() {
+    if (isRunning) {
+      const currentTime = new Date().getTime();
+      const lapTime = currentTime - startTime;
+
+      lapTimes.push(lapTime);
+
+      // Display lap time
+      const lapList = document.getElementById("lapList");
+      const lapItem = document.createElement("li");
+      lapItem.innerText = formatTime(lapTime);
+      lapList.appendChild(lapItem);
+    }
+  }
+
+  function reset() {
+    clearInterval(timer);
+    isRunning = false;
+    elapsedTime = 0;
+    document.getElementById("display").innerText = "00:00:00";
+    document.getElementById("lapList").innerHTML = "";
+    updateButtons();
+  }
+
+  function updateDisplay() {
+    const currentTime = new Date().getTime();
+    elapsedTime = currentTime - startTime;
+    document.getElementById("display").innerText = formatTime(elapsedTime);
+  }
+
+  function formatTime(time) {
+    const date = new Date(time);
+    const minutes = date.getUTCMinutes().toString().padStart(2, "0");
+    const seconds = date.getUTCSeconds().toString().padStart(2, "0");
+    const milliseconds = Math.floor(date.getUTCMilliseconds() / 10).toString().padStart(2, "0");
+    return `${minutes}:${seconds}:${milliseconds}`;
+  }
+
+  function updateButtons() {
+    document.querySelector("button:nth-child(1)").innerText = isRunning ? "Stop" : "Start";
+    document.querySelector("button:nth-child(2)").disabled = !isRunning;
+  }
+</script>
+
+</body>
+</html>
